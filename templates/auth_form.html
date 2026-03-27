@@ -1,0 +1,88 @@
+<form class="fade-in" method="POST" action="/auth?mode={{ mode }}">
+    {% if mode == 'login' %}
+        <div class="input-wrapper">
+            <ion-icon name="mail-outline"></ion-icon>
+            <input type="email" name="email" placeholder="Email Address" required>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" name="password" placeholder="Password" required>
+        </div>
+    {% else %}
+        <div class="input-wrapper">
+            <ion-icon name="person-outline"></ion-icon>
+            <input type="text" name="fullname" placeholder="Full Name" required>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="mail-outline"></ion-icon>
+            <input type="email" name="email" placeholder="Email Address" required>
+        </div>
+        <div class="input-wrapper has-warning">
+            <ion-icon name="call-outline"></ion-icon>
+            <input type="tel" name="phone" placeholder="Phone Number" inputmode="numeric" minlength="11" maxlength="11" pattern="[0-9]{11}" title="Phone number must be exactly 11 digits" required>
+            <span class="input-warning">Phone number must be exactly 11 digits.</span>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="map-outline"></ion-icon>
+            <select name="province" required>
+                <option value="" disabled selected>Select Province</option>
+                <option value="Negros Occidental">Negros Occidental</option>
+            </select>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="business-outline"></ion-icon>
+            <select name="municipality" required>
+                <option value="" disabled selected>Select Municipality</option>
+                <option value="Isabela">Isabela</option>
+            </select>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="home-outline"></ion-icon>
+            <select name="barangay" required>
+                <option value="" disabled selected>Select Barangay</option>
+                <option value="Amin">Amin</option>
+                <option value="Banogbanog">Banogbanog</option>
+                <option value="Bulad">Bulad</option>
+                <option value="Bungahin">Bungahin</option>
+                <option value="Cabcab">Cabcab</option>
+                <option value="Camangcamang">Camangcamang</option>
+                <option value="Camp Clark">Camp Clark</option>
+                <option value="Cansalongon">Cansalongon</option>
+                <option value="Guintubhan">Guintubhan</option>
+                <option value="Libas">Libas</option>
+                <option value="Limalima">Limalima</option>
+                <option value="Makilignit">Makilignit</option>
+                <option value="Mansablay">Mansablay</option>
+                <option value="Maytubig">Maytubig</option>
+                <option value="Panaquiao">Panaquiao</option>
+                <option value="Barangay 1 (Poblacion)">Barangay 1 (Poblacion)</option>
+                <option value="Barangay 2 (Poblacion)">Barangay 2 (Poblacion)</option>
+                <option value="Barangay 3 (Poblacion)">Barangay 3 (Poblacion)</option>
+                <option value="Barangay 4 (Poblacion)">Barangay 4 (Poblacion)</option>
+                <option value="Barangay 5 (Poblacion)">Barangay 5 (Poblacion)</option>
+                <option value="Barangay 6 (Poblacion)">Barangay 6 (Poblacion)</option>
+                <option value="Barangay 7 (Poblacion)">Barangay 7 (Poblacion)</option>
+                <option value="Barangay 8 (Poblacion)">Barangay 8 (Poblacion)</option>
+                <option value="Barangay 9 (Poblacion)">Barangay 9 (Poblacion)</option>
+                <option value="Riverside">Riverside</option>
+                <option value="Rumirang">Rumirang</option>
+                <option value="San Agustin">San Agustin</option>
+                <option value="Sebucawan">Sebucawan</option>
+                <option value="Sikatuna">Sikatuna</option>
+                <option value="Tinongan">Tinongan</option>
+            </select>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" name="password" placeholder="Password" required>
+        </div>
+        <div class="input-wrapper">
+            <ion-icon name="lock-closed-outline"></ion-icon>
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+        </div>
+    {% endif %}
+
+    <button type="submit" class="primary-btn">
+        {{ 'Sign In' if mode == 'login' else 'Create Account' }}
+    </button>
+</form>

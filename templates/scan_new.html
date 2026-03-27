@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | New Scan</title>
+</head>
+<body class="scanner-layout">
+    <div class="scanner-screen">
+        <div class="scanner-top">
+            <a href="/homepage" class="scan-back-link">&larr; Back to Dashboard</a>
+            <div class="scan-title">Sugarcane Scanner</div>
+            <div class="scan-subtitle">Keep the stalk centered and vertical</div>
+        </div>
+        <div class="scanner-viewport">
+            <video id="viewfinder" autoplay muted playsinline></video>
+            <div class="ar-overlay" aria-hidden="true">
+                <span class="ar-corner corner-top-left"></span>
+                <span class="ar-corner corner-top-right"></span>
+                <span class="ar-corner corner-bottom-left"></span>
+                <span class="ar-corner corner-bottom-right"></span>
+                <span class="ar-center-line"></span>
+            </div>
+            <div class="orientation-overlay" aria-hidden="true">
+                Please rotate your phone to Portrait
+            </div>
+            <div class="shutter-flash" id="shutter-flash" aria-hidden="true"></div>
+        </div>
+        <canvas id="scan-canvas" class="scan-canvas" hidden></canvas>
+        <div class="scanner-actions">
+            <div id="scanner-message" class="scanner-message" role="status"></div>
+            <div class="scanner-controls">
+                <button type="button" class="mode-btn is-active">RGB</button>
+                <button type="button" class="mode-btn">HSV</button>
+                <button type="button" class="capture-btn" id="capture-btn">Capture</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card fade-in scan-entry-card">
+        <div class="scan-header">
+            <div class="scan-icon-circle">
+                <ion-icon name="camera-outline"></ion-icon>
+            </div>
+            <h2 class="scan-title">New Scan Entry</h2>
+            <p class="scan-subtitle">Save a new sugarcane assessment</p>
+        </div>
+
+        {% if error %}
+            <div class="form-error">{{ error }}</div>
+        {% endif %}
+
+        <form class="fade-in" method="POST" action="/scan/new">
+            <div class="input-wrapper">
+                <ion-icon name="leaf-outline"></ion-icon>
+                <input type="text" name="plot_name" placeholder="Plot Name (e.g., Plot #3)" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="stats-chart-outline"></ion-icon>
+                <input type="number" name="maturity_pct" placeholder="Maturity Percentage (0-100)" min="0" max="100" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="ribbon-outline"></ion-icon>
+                <input type="text" name="grade" placeholder="Grade (A, B, or C)" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                <input type="text" name="status" placeholder="Status (ready, monitor, healthy)" required>
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Save Scan
+            </button>
+        </form>
+    </div>
+
+    <script>
+        (() => {
+            const viewfinder = document.getElementById('viewfinder');
+            const canvas = document.getElementById('scan-canvas');
+            const captureBtn = document.getElementById('capture-btn');
+            const flash = document.getElementById('shutter-flash');
+            const message = document.getElementById('scanner-message');
+            let activeStream = null;
+
+            const setMessage = (text) => {
+                if (message) {
+                    message.textContent = text;
+                }
+            };
+
+            const stopScanner = () => {
+                if (activeStream) {
+                    activeStream.getTracks().forEach((track) => track.stop());
+                    activeStream = null;
+                }
+                if (viewfinder) {
+                    viewfinder.srcObject = null;
+                }
+            };
+
+            const applyEnhancedConstraints = (track) => {
+                if (!track || !track.getCapabilities || !track.applyConstraints) {
+                    return;
+                }
+                const capabilities = track.getCapabilities();
+                const advanced = [];
+                if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
+                    advanced.push({ focusMode: 'continuous' });
+                }
+                if (capabilities.zoom) {
+                    const zoomValue = Math.min(capabilities.zoom.max, Math.max(capabilities.zoom.min, 1));
+                    advanced.push({ zoom: zoomValue });
+                }
+                if (advanced.length) {
+                    track.applyConstraints({ advanced }).catch(() => {});
+                }
+            };
+
+            const startScanner = async () => {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    setMessage('Error: Camera requires an HTTPS connection. If testing locally, use a self-signed certificate.');
+                    return;
+                }
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { exact: 'environment' } },
+                        audio: false
+                    });
+                    activeStream = stream;
+                    viewfinder.srcObject = stream;
+                    await viewfinder.play();
+                    applyEnhancedConstraints(stream.getVideoTracks()[0]);
+                    setMessage('');
+                } catch (error) {
+                    try {
+                        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: 'user' },
+                            audio: false
+                        });
+                        activeStream = fallbackStream;
+                        viewfinder.srcObject = fallbackStream;
+                        await viewfinder.play();
+                        applyEnhancedConstraints(fallbackStream.getVideoTracks()[0]);
+                        setMessage('');
+                    } catch (fallbackError) {
+                        setMessage('Unable to access the camera. Please check permissions and try again.');
+                    }
+                }
+            };
+
+            const triggerFlash = () => {
+                if (!flash) {
+                    return;
+                }
+                flash.classList.add('is-active');
+                window.setTimeout(() => {
+                    flash.classList.remove('is-active');
+                }, 150);
+            };
+
+            const captureFrame = () => {
+                if (!canvas || !viewfinder || viewfinder.videoWidth === 0) {
+                    return;
+                }
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+                triggerFlash();
+                canvas.width = viewfinder.videoWidth;
+                canvas.height = viewfinder.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(viewfinder, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        return;
+                    }
+                    const formData = new FormData();
+                    formData.append('image', blob, 'stalk.jpg');
+                    fetch('/analyze_stalk', {
+                        method: 'POST',
+                        body: formData
+                    }).catch(() => {
+                        setMessage('Upload failed. Please try again.');
+                    });
+                }, 'image/jpeg', 0.92);
+            };
+
+            if (captureBtn) {
+                captureBtn.addEventListener('click', captureFrame);
+            }
+
+            startScanner();
+            window.addEventListener('pagehide', stopScanner);
+            window.addEventListener('beforeunload', stopScanner);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopScanner();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+

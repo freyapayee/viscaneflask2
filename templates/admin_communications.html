@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Communications & Support</title>
+</head>
+<body class="admin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Comms & Support</p>
+                    <p class="brand-subtitle">Announcements and farmer feedback</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a class="btn light" href="/admin">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back to Home
+                </a>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        {% if message %}
+            <div class="form-success">{{ message }}</div>
+        {% endif %}
+
+        <section class="section-grid two-col">
+            <form class="panel" method="POST">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Post Announcement</h3>
+                        <p class="panel-subtitle">Notify farmers of updates</p>
+                    </div>
+                    <button class="btn primary" type="submit">
+                        <ion-icon name="send-outline"></ion-icon>
+                        Publish
+                    </button>
+                </div>
+                <div class="stat-label">Title</div>
+                <input class="stat-input" type="text" name="title" required>
+                <div class="stat-label">Message</div>
+                <textarea class="stat-input" name="message" rows="4" required></textarea>
+            </form>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Recent Announcements</h3>
+                        <p class="panel-subtitle">Last 10 broadcasts</p>
+                    </div>
+                </div>
+                <div class="results-grid">
+                    {% if notifications %}
+                        {% for note in notifications %}
+                            <div class="result-row">
+                                <div>
+                                    <div class="result-label">{{ note.title }}</div>
+                                    <div class="list-meta">{{ note.message }}</div>
+                                </div>
+                                <div class="list-meta">{{ note.created_at.strftime('%b %d, %I:%M %p') }}</div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-meta">No announcements yet.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Farmer Feedback</h3>
+                    <p class="panel-subtitle">Support requests and suggestions</p>
+                </div>
+                <span class="badge"><ion-icon name="chatbubbles-outline"></ion-icon>{{ feedback|length }} messages</span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Farmer ID</th>
+                        <th>Message</th>
+                        <th>Received</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if feedback %}
+                        {% for entry in feedback %}
+                            <tr>
+                                <td>{{ entry.user_id if entry.user_id else 'Unknown' }}</td>
+                                <td>{{ entry.message }}</td>
+                                <td>{{ entry.created_at.strftime('%b %d, %I:%M %p') }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3">No feedback submitted yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+
+        <div class="footer-link">VISCANE Admin | Communications & Support</div>
+    </main>
+</body>
+</html>

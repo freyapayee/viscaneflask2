@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Admin Console</title>
+</head>
+<body class="admin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Admin Console</p>
+                    <p class="brand-subtitle">System Status: Operational</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-pill">
+                    <ion-icon name="pulse-outline"></ion-icon>
+                    Uptime 99.9%
+                </div>
+                <a class="btn light" href="/superadmin-login">
+                    <ion-icon name="shield-checkmark-outline"></ion-icon>
+                    Superadmin
+                </a>
+                <button class="btn light">
+                    <ion-icon name="download-outline"></ion-icon>
+                    Export Data
+                </button>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        <section class="stats-grid">
+            <div class="stat-card accent-blue">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">{{ stats.active_users | default('0') }}</div>
+                <div class="stat-meta">Registered farmers</div>
+            </div>
+            <div class="stat-card accent-green">
+                <div class="stat-label">Total Scans</div>
+                <div class="stat-value">{{ stats.total_scans | default('0') }}</div>
+                <div class="stat-meta">All-time submissions</div>
+            </div>
+            <div class="stat-card accent-purple">
+                <div class="stat-label">Accuracy</div>
+                <div class="stat-value">{{ stats.model_accuracy | default('98.6') }}%</div>
+                <div class="stat-meta">Validated Feb 4</div>
+            </div>
+            <div class="stat-card accent-orange storage-card {{ 'is-critical' if (stats.storage_utilization | default('68') | float) > 90 else '' }}" {% if (stats.storage_utilization | default('68') | float) > 90 %}title="Disk space is running low. Please archive old scans."{% endif %}>
+                <div class="stat-label">Storage</div>
+                <div class="stat-value {{ 'text-danger' if (stats.storage_utilization | default('68') | float) > 90 else '' }}">
+                    {{ stats.storage_utilization | default('68') }}%
+                    {% if (stats.storage_utilization | default('68') | float) > 90 %}
+                        <span class="stat-warning-icon" aria-hidden="true">&#9888;</span>
+                    {% endif %}
+                </div>
+                <div class="stat-meta">Disk utilization</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Admin Modules</h3>
+                    <p class="panel-subtitle">Operations and farmer support tools</p>
+                </div>
+            </div>
+            <div class="action-grid admin-tools">
+                <a class="action-tile" href="/admin/farmers">
+                    <ion-icon name="people-outline"></ion-icon>
+                    <div>Farmer Accounts</div>
+                </a>
+                <a class="action-tile" href="/admin/monitoring">
+                    <ion-icon name="analytics-outline"></ion-icon>
+                    <div>Data Monitoring</div>
+                </a>
+                <a class="action-tile" href="/admin/models">
+                    <ion-icon name="cloud-upload-outline"></ion-icon>
+                    <div>Model Updates</div>
+                </a>
+                <a class="action-tile" href="/admin/reports">
+                    <ion-icon name="bar-chart-outline"></ion-icon>
+                    <div>Scoped Reports</div>
+                </a>
+                <a class="action-tile" href="/admin/communications">
+                    <ion-icon name="chatbox-ellipses-outline"></ion-icon>
+                    <div>Comms & Support</div>
+                </a>
+            </div>
+        </section>
+
+        <section class="section-grid two-col">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">System Logs</h3>
+                        <p class="panel-subtitle">Latest platform events</p>
+                    </div>
+                    <span class="badge"><ion-icon name="time-outline"></ion-icon>Updated 5 min ago</span>
+                </div>
+                {% for log in logs %}
+                    <div class="list-row">
+                        <div class="list-badge" style="background: #E3F2FD; color: #1565C0;">
+                            <ion-icon name="{{ log.icon }}"></ion-icon>
+                        </div>
+                        <div class="list-main" style="flex: 1;">
+                            <h4>{{ log.title }}</h4>
+                            <div class="list-meta">{{ log.meta }}</div>
+                        </div>
+                        <div class="list-status" style="color: {{ log.color }};">{{ log.status }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Model and Data Health</h3>
+                        <p class="panel-subtitle">Quality and performance overview</p>
+                    </div>
+                    <span class="badge"><ion-icon name="shield-checkmark-outline"></ion-icon>Stable</span>
+                </div>
+                <div class="list-row">
+                    <div class="list-badge"><ion-icon name="analytics-outline"></ion-icon></div>
+                    <div style="flex: 1;">
+                        <div class="list-meta">Model accuracy</div>
+                        <strong>{{ stats.model_accuracy | default('98.6') }}%</strong>
+                        <div class="progress"><span style="width: 98%;"></span></div>
+                    </div>
+                </div>
+                <div class="list-row">
+                    <div class="list-badge"><ion-icon name="layers-outline"></ion-icon></div>
+                    <div style="flex: 1;">
+                        <div class="list-meta">Training data freshness</div>
+                        <strong>92%</strong>
+                        <div class="progress"><span style="width: 92%;"></span></div>
+                    </div>
+                </div>
+                <div class="list-row">
+                    <div class="list-badge"><ion-icon name="cloud-done-outline"></ion-icon></div>
+                    <div style="flex: 1;">
+                        <div class="list-meta">Storage utilization</div>
+                        <strong>{{ stats.storage_utilization | default('68') }}%</strong>
+                        <div class="progress"><span style="width: 68%;"></span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" style="margin-bottom: 24px;">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">User Management</h3>
+                    <p class="panel-subtitle">Role access and monitoring</p>
+                </div>
+                <button class="btn ghost">
+                    <ion-icon name="person-add-outline"></ion-icon>
+                    Invite User
+                </button>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if users %}
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.fullname }}</td>
+                                <td>Farmer</td>
+                                <td><span class="tag success">Active</span></td>
+                                <td>Recent</td>
+                                <td><span class="tag">View</span></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5">No users registered yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Admin Tools</h3>
+                    <p class="panel-subtitle">Quick access to system operations</p>
+                </div>
+            </div>
+            <div class="action-grid">
+                <div class="action-tile">
+                    <ion-icon name="people-outline" style="font-size: 22px; color: var(--accent);"></ion-icon>
+                    <div>Manage Users</div>
+                </div>
+                <div class="action-tile">
+                    <ion-icon name="settings-outline" style="font-size: 22px; color: var(--accent);"></ion-icon>
+                    <div>System Settings</div>
+                </div>
+                <div class="action-tile">
+                    <ion-icon name="document-text-outline" style="font-size: 22px; color: var(--accent);"></ion-icon>
+                    <div>Audit Reports</div>
+                </div>
+                <div class="action-tile">
+                    <ion-icon name="shield-checkmark-outline" style="font-size: 22px; color: var(--accent);"></ion-icon>
+                    <div>Access Control</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-link">VISCANE Admin Console | Secure System Management</div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISCANE | Calculation Results</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="farmer-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Hello, {{ user.fullname }}</p>
+                    <p class="brand-subtitle">Isabela, Negros Occidental | Online</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a class="btn light" href="/homepage">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        <section class="results-card">
+            <div class="results-header">
+                <div>
+                    <div class="hero-badge results-badge">
+                        <ion-icon name="leaf-outline"></ion-icon>
+                        Calculation Result
+                    </div>
+                    <h2 class="results-title">Harvest Summary</h2>
+                    <p class="results-subtitle">Generated from your latest input.</p>
+                    <p class="results-meta">Data source: latest scan + manual entry.</p>
+                </div>
+            </div>
+
+            <div class="results-grid">
+                <div class="result-row">
+                    <span class="result-label">
+                        <span class="result-icon">
+                            <ion-icon name="leaf-outline"></ion-icon>
+                        </span>
+                        Variety
+                    </span>
+                    <span class="result-value">{{ variety_display }}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">
+                        <span class="result-icon">
+                            <ion-icon name="analytics-outline"></ion-icon>
+                        </span>
+                        Maturity
+                    </span>
+                    <span class="result-value">{{ maturity_display }}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">
+                        <span class="result-icon">
+                            <ion-icon name="speedometer-outline"></ion-icon>
+                        </span>
+                        LKG TC
+                    </span>
+                    <span class="result-value{% if lkg_tc_display == 'Pending' %} is-pending{% endif %}">{{ lkg_tc_display }}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">
+                        <span class="result-icon">
+                            <ion-icon name="bar-chart-outline"></ion-icon>
+                        </span>
+                        TCH
+                    </span>
+                    <span class="result-value">{{ tch_display }}</span>
+                </div>
+                <div class="result-row result-highlight">
+                    <span class="result-label">
+                        <span class="result-icon">
+                            <ion-icon name="sparkles-outline"></ion-icon>
+                        </span>
+                        Predicted LKG TC
+                    </span>
+                    <span class="result-value{% if predicted_lkg_tc_display == 'Pending' %} is-pending{% endif %}">
+                        {{ predicted_lkg_tc_display }}
+                        <span class="result-unit">LKG/TC</span>
+                    </span>
+                </div>
+            </div>
+        </section>
+        <div class="mobile-actions">
+            <a class="btn ghost" href="/homepage#calc-form">
+                <ion-icon name="refresh-outline"></ion-icon>
+                Recalculate
+            </a>
+            <a class="btn primary" href="/homepage">
+                <ion-icon name="arrow-back-outline"></ion-icon>
+                Back to Dashboard
+            </a>
+        </div>
+    </main>
+</body>
+</html>

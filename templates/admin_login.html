@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Admin Login</title>
+</head>
+<body>
+    <div class="card fade-in">
+        <div class="admin-login-header">
+            <div class="admin-login-icon-circle">
+                <ion-icon name="shield-checkmark-outline" class="admin-login-icon"></ion-icon>
+            </div>
+            <h2 class="admin-login-title">Admin Console</h2>
+            <p class="admin-login-subtitle">Secure access to system controls</p>
+        </div>
+
+        {% if error %}
+            <div class="form-error">{{ error }}</div>
+        {% endif %}
+
+        <form class="fade-in" method="POST" action="/admin-login">
+            <div class="input-wrapper">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" name="identifier" placeholder="Username or Email" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Sign In as Admin
+            </button>
+        </form>
+
+        <div class="admin-login-link-row">
+            <a href="/admin-reset" class="admin-login-link">Forgot password?</a>
+        </div>
+
+        <div class="admin-login-footer">
+            <a href="/" class="admin-login-back-link">&larr; Back to Selection</a>
+        </div>
+    </div>
+</body>
+</html>

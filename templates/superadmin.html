@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Superadmin Console</title>
+</head>
+<body class="admin-layout superadmin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header superadmin-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Superadmin Console</p>
+                    <p class="brand-subtitle">System Control & Governance</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-pill superadmin-pill">
+                    <ion-icon name="pulse-outline"></ion-icon>
+                    Platform Live
+                </div>
+                <a class="btn light" href="/admin">
+                    <ion-icon name="grid-outline"></ion-icon>
+                    Admin
+                </a>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        <section class="stats-grid superadmin-stats">
+            <div class="stat-card accent-blue">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-meta">Registered farmers</div>
+            </div>
+            <div class="stat-card accent-green">
+                <div class="stat-label">Active Farmers</div>
+                <div class="stat-value">{{ active_farmers }}</div>
+                <div class="stat-meta">Last 7 days</div>
+            </div>
+            <div class="stat-card accent-purple">
+                <div class="stat-label">Total Admins</div>
+                <div class="stat-value">{{ total_admins }}</div>
+                <div class="stat-meta">Role-managed</div>
+            </div>
+            <div class="stat-card accent-orange">
+                <div class="stat-label">Pending Scans</div>
+                <div class="stat-value">{{ pending_scans }}</div>
+                <div class="stat-meta">{{ total_scans }} total scans</div>
+            </div>
+        </section>
+
+        <section class="panel superadmin-panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Superadmin Modules</h3>
+                    <p class="panel-subtitle">System governance and compliance tools</p>
+                </div>
+            </div>
+            <div class="action-grid superadmin-tools">
+                <a class="action-tile" href="/superadmin/settings">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    <div>System Settings</div>
+                </a>
+                <a class="action-tile" href="/superadmin/reports">
+                    <ion-icon name="bar-chart-outline"></ion-icon>
+                    <div>Reports & Analytics</div>
+                </a>
+                <a class="action-tile" href="/superadmin/audit">
+                    <ion-icon name="shield-checkmark-outline"></ion-icon>
+                    <div>Audit & Compliance</div>
+                </a>
+            </div>
+        </section>
+
+        <section class="section-grid two-col">
+            <div class="panel superadmin-panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Admin Management</h3>
+                        <p class="panel-subtitle">Role assignment and access control</p>
+                    </div>
+                    <span class="badge superadmin-badge"><ion-icon name="lock-closed-outline"></ion-icon>Restricted</span>
+                </div>
+                {% if admins %}
+                    {% for admin in admins %}
+                        <div class="list-row superadmin-list-row">
+                            <div class="list-badge superadmin-icon-badge">
+                                <ion-icon name="person-circle-outline"></ion-icon>
+                            </div>
+                            <div class="list-main superadmin-list-main">
+                                <div class="list-meta">{{ admin.email }}</div>
+                                <strong>{{ admin.username }}</strong>
+                                <div class="list-meta">Role: {{ admin.role }}</div>
+                            </div>
+                            <div class="superadmin-action-row">
+                                <form method="POST" action="/superadmin/admins/role">
+                                    <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                                    <select name="role" class="tag superadmin-tag-select">
+                                        <option value="admin" {% if admin.role == 'admin' %}selected{% endif %}>Admin</option>
+                                        <option value="superadmin" {% if admin.role == 'superadmin' %}selected{% endif %}>Superadmin</option>
+                                    </select>
+                                    <button class="tag superadmin-tag" type="submit">Update</button>
+                                </form>
+                                <form method="POST" action="/superadmin/admins/archive">
+                                    <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                                    <button class="tag warning superadmin-tag" type="submit">Archive</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="list-meta">No admin accounts found.</div>
+                {% endif %}
+            </div>
+
+            <div class="panel superadmin-panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Recent Scans</h3>
+                        <p class="panel-subtitle">Latest farmer activity</p>
+                    </div>
+                    <span class="badge superadmin-badge"><ion-icon name="time-outline"></ion-icon>Live</span>
+                </div>
+                {% if recent_scans %}
+                    {% for scan in recent_scans %}
+                        <div class="recent-item superadmin-recent">
+                            <div class="recent-grade">{{ scan.grade }}</div>
+                            <div class="superadmin-list-main">
+                                <h4 style="margin: 0;">{{ scan.plot_name }}</h4>
+                                <div class="list-meta">{{ scan.created_at.strftime('%b %d, %I:%M %p') }} | Maturity {{ scan.maturity_pct }}%</div>
+                            </div>
+                            <span class="tag {% if scan.status == 'ready' %}success{% elif scan.status == 'monitor' %}warning{% else %}alert{% endif %}">{{ scan.status }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="list-meta">No scans yet.</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="panel superadmin-panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">User Governance</h3>
+                    <p class="panel-subtitle">Farmer registry management</p>
+                </div>
+                <span class="badge superadmin-badge"><ion-icon name="people-outline"></ion-icon>{{ total_users }} users</span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if users %}
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.fullname }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.phone }}</td>
+                                <td>
+                                    <form method="POST" action="/superadmin/users/archive">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <button class="tag warning" type="submit" onclick="return confirm('Archive this user?')">Archive</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No users found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+
+        <div class="footer-link">VISCANE Superadmin | Governance & Oversight</div>
+    </main>
+</body>
+</html>

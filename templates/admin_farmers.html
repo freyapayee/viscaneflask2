@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Farmer Account Management</title>
+</head>
+<body class="admin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Farmer Account Management</p>
+                    <p class="brand-subtitle">Create, edit, and deactivate farmers</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a class="btn light" href="/admin">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back to Home
+                </a>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        {% if message %}
+            <div class="form-success">{{ message }}</div>
+        {% endif %}
+        {% if error %}
+            <div class="form-error">{{ error }}</div>
+        {% endif %}
+
+        <section class="section-grid two-col">
+            <form class="panel" method="POST">
+                <input type="hidden" name="action" value="create">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Create Farmer Account</h3>
+                        <p class="panel-subtitle">Add new farmer credentials</p>
+                    </div>
+                    <button class="btn primary" type="submit">
+                        <ion-icon name="person-add-outline"></ion-icon>
+                        Create
+                    </button>
+                </div>
+                <div class="stat-label">Full Name</div>
+                <input class="stat-input" type="text" name="fullname" required>
+                <div class="stat-label">Email Address</div>
+                <input class="stat-input" type="email" name="email" required>
+                <div class="stat-label">Phone Number</div>
+                <input class="stat-input" type="text" name="phone" required>
+                <div class="stat-label">Province</div>
+                <input class="stat-input" type="text" name="province" placeholder="Negros Occidental">
+                <div class="stat-label">Municipality</div>
+                <input class="stat-input" type="text" name="municipality" placeholder="Isabela">
+                <div class="stat-label">Barangay</div>
+                <input class="stat-input" type="text" name="barangay">
+                <div class="stat-label">Temporary Password</div>
+                <input class="stat-input" type="text" name="password" required>
+            </form>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Account Actions</h3>
+                        <p class="panel-subtitle">Edit, reset, or deactivate</p>
+                    </div>
+                    <span class="badge"><ion-icon name="people-outline"></ion-icon>{{ users|length }} farmers</span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Farmer</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if users %}
+                            {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ user.fullname }}</strong><br>
+                                        <span class="list-meta">{{ user.email }}</span>
+                                    </td>
+                                    <td>{{ user.municipality or 'N/A' }}, {{ user.barangay or 'N/A' }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="tag success">Active</span>
+                                        {% else %}
+                                            <span class="tag alert">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="admin-action-row">
+                                            <a class="tag" href="/admin/farmers/{{ user.id }}/edit">Edit</a>
+                                            <form method="POST" action="/admin/farmers">
+                                                <input type="hidden" name="action" value="reset">
+                                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                <button class="tag warning" type="submit">Reset</button>
+                                            </form>
+                                            <form method="POST" action="/admin/farmers">
+                                                {% if user.is_active %}
+                                                    <input type="hidden" name="action" value="deactivate">
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <button class="tag alert" type="submit">Deactivate</button>
+                                                {% else %}
+                                                    <input type="hidden" name="action" value="activate">
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <button class="tag success" type="submit">Activate</button>
+                                                {% endif %}
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4">No farmers registered yet.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="footer-link">VISCANE Admin | Farmer Account Management</div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Authentication</title>
+</head>
+<body>
+    <div class="card fade-in">
+        <div class="auth-header">
+            <div class="auth-logo-circle">
+                <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" class="auth-logo-img">
+            </div>
+            <h2 class="auth-title">VISCANE</h2>
+            <p class="auth-subtitle">An Edge-Based AI for Sugarcane Quality Grading</p>
+        </div>
+
+        <div class="toggle-wrapper">
+            <div id="pill-bg" class="pill {{ 'register' if mode == 'register' }}"></div>
+            <button id="login-btn" class="toggle-btn {{ 'active' if mode == 'login' }}" 
+                    hx-get="/auth?mode=login" hx-target="#form-container" onclick="moveToggle('login')">Login</button>
+            <button id="register-btn" class="toggle-btn {{ 'active' if mode == 'register' }}" 
+                    hx-get="/auth?mode=register" hx-target="#form-container" onclick="moveToggle('register')">Register</button>
+        </div>
+
+        <div id="form-container">
+            {% include 'auth_form.html' %}
+        </div>
+
+        {% if error %}
+            <div class="form-error">{{ error }}</div>
+        {% endif %}
+
+        <div class="auth-footer">
+            <a href="/" class="auth-back-link">&larr; Back to Selection</a>
+        </div>
+    </div>
+
+    <script>
+        function moveToggle(mode) {
+            const pill = document.getElementById('pill-bg');
+            const loginBtn = document.getElementById('login-btn');
+            const regBtn = document.getElementById('register-btn');
+            if (mode === 'register') {
+                pill.classList.add('register');
+                regBtn.classList.add('active');
+                loginBtn.classList.remove('active');
+            } else {
+                pill.classList.remove('register');
+                loginBtn.classList.add('active');
+                regBtn.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

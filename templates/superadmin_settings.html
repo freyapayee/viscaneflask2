@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | System Settings</title>
+</head>
+<body class="admin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">System Settings</p>
+                    <p class="brand-subtitle">Global configuration & governance</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-pill">
+                    <ion-icon name="settings-outline"></ion-icon>
+                    Configuration
+                </div>
+                <a class="btn light" href="/superadmin">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back to Home
+                </a>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        <form class="panel" method="POST">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Global Configuration</h3>
+                    <p class="panel-subtitle">Branding and maintenance controls</p>
+                </div>
+                <button class="btn primary" type="submit">
+                    <ion-icon name="save-outline"></ion-icon>
+                    Save Changes
+                </button>
+            </div>
+
+            <div class="stat-label">Global System Name</div>
+            <input class="stat-input" type="text" name="system_name" value="{{ config.system_name }}" required>
+            <div class="stat-helper">Displayed across portals and compliance exports.</div>
+
+            <label class="checkbox-row">
+                <input type="checkbox" name="maintenance_mode" {% if config.maintenance_mode %}checked{% endif %}>
+                <span>Enable Maintenance Mode</span>
+            </label>
+            <div class="stat-helper">Temporarily suspend farmer access for system updates.</div>
+
+            <div class="stat-helper">Last updated: {{ config.updated_at.strftime('%b %d, %Y %I:%M %p') if config.updated_at else 'Never' }}</div>
+        </form>
+
+        <div class="footer-link">VISCANE Superadmin | System Settings</div>
+    </main>
+</body>
+</html>

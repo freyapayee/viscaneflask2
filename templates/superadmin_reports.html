@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Reports & Analytics</title>
+</head>
+<body class="admin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Reports & Analytics</p>
+                    <p class="brand-subtitle">SRA compliance-ready summaries</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-pill">
+                    <ion-icon name="bar-chart-outline"></ion-icon>
+                    Live Aggregates
+                </div>
+                <a class="btn light" href="/superadmin">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back to Home
+                </a>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        <section class="stats-grid">
+            <div class="stat-card accent-green">
+                <div class="stat-label">Average LKG/TC</div>
+                <div class="stat-value">{{ report.avg_lkg_tc }}</div>
+                <div class="stat-meta">Platform average</div>
+            </div>
+            <div class="stat-card accent-blue">
+                <div class="stat-label">Total Predicted Yield</div>
+                <div class="stat-value">{{ report.total_predicted_yield }}</div>
+                <div class="stat-meta">Estimated TCH units</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Compliance Export</h3>
+                    <p class="panel-subtitle">Download for SRA review</p>
+                </div>
+                <a class="btn ghost" href="/superadmin/reports/download">
+                    <ion-icon name="download-outline"></ion-icon>
+                    Download CSV
+                </a>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Plot</th>
+                        <th>Grade</th>
+                        <th>Maturity</th>
+                        <th>TCH</th>
+                        <th>LKG/TC</th>
+                        <th>Captured</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if rows %}
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ row.plot_name }}</td>
+                                <td>{{ row.grade }}</td>
+                                <td>{{ row.maturity_pct }}%</td>
+                                <td>{{ row.tch }}</td>
+                                <td>{{ row.lkg_tc }}</td>
+                                <td>{{ row.created_at.strftime('%b %d, %Y') }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No scan data available for reporting.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+
+        <div class="footer-link">VISCANE Superadmin | Reports & Analytics</div>
+    </main>
+</body>
+</html>

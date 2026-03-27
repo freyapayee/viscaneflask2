@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Scoped Reports</title>
+</head>
+<body class="admin-layout">
+    <div class="dashboard-bg"></div>
+
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-icon">
+                    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="VISCANE Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                </div>
+                <div>
+                    <p class="brand-title">Scoped Reports</p>
+                    <p class="brand-subtitle">Farm and region performance summaries</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a class="btn light" href="/admin">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    Back to Home
+                </a>
+                <a class="btn light" href="/admin-logout">
+                    <ion-icon name="power"></ion-icon>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container fade-in">
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3 class="panel-title">Farm Performance</h3>
+                    <p class="panel-subtitle">Aggregated maturity and yield signals</p>
+                </div>
+                <span class="badge"><ion-icon name="analytics-outline"></ion-icon>{{ rows|length }} farms</span>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Farmer</th>
+                        <th>Municipality</th>
+                        <th>Barangay</th>
+                        <th>Scans</th>
+                        <th>Avg Maturity</th>
+                        <th>Avg TCH</th>
+                        <th>Avg LKG/TC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if rows %}
+                        {% for row in rows %}
+                            <tr>
+                                <td>{{ row.name }}</td>
+                                <td>{{ row.municipality }}</td>
+                                <td>{{ row.barangay }}</td>
+                                <td>{{ row.scans }}</td>
+                                <td>{{ row.avg_maturity }}%</td>
+                                <td>{{ row.avg_tch }}</td>
+                                <td>{{ row.avg_lkg_tc }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7">No data available yet.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+
+        <div class="footer-link">VISCANE Admin | Scoped Reports</div>
+    </main>
+</body>
+</html>

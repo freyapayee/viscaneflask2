@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>VISCANE | Create Admin</title>
+</head>
+<body>
+    <div class="card fade-in">
+        <div style="text-align: center;">
+            <div style="background: #1E5BBF; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.2);">
+                <ion-icon name="person-add-outline" style="font-size: 30px;"></ion-icon>
+            </div>
+            <h2 style="margin: 15px 0 5px;">Create First Admin</h2>
+            <p style="color: rgba(255,255,255,0.6); font-size: 13px;">Set up the initial superadmin account</p>
+        </div>
+
+        {% if error %}
+            <div class="form-error">{{ error }}</div>
+        {% endif %}
+
+        <form class="fade-in" method="POST" action="/admin-setup">
+            <div class="input-wrapper">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" name="username" placeholder="Admin Username" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" name="email" placeholder="Admin Email" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <div class="input-wrapper">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            </div>
+
+            <button type="submit" class="primary-btn">
+                Create Admin
+            </button>
+        </form>
+    </div>
+</body>
+</html>
